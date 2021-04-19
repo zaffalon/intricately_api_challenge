@@ -149,20 +149,21 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
             ],
             related_hostnames: [
               {
-                count: 1,
-                hostname: lorem
-              },
-              {
-                count: 4,
-                hostname: ipsum
+                count: 3,
+                hostname: amet
               },
               {
                 count: 4,
                 hostname: dolor
               },
               {
-                count: 3,
-                hostname: amet
+                count: 4,
+                hostname: ipsum
+              },
+
+              {
+                count: 1,
+                hostname: lorem
               },
               {
                 count: 2,
@@ -170,6 +171,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
               }
             ]
           }
+
         end
 
         before :each do
@@ -200,7 +202,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
             related_hostnames: [
               {
                 count: 1,
-                hostname: ipsum
+                hostname: amet
               },
               {
                 count: 1,
@@ -208,7 +210,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
               },
               {
                 count: 1,
-                hostname: amet
+                hostname: ipsum
               }
             ]
           }
@@ -253,16 +255,16 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
             ],
             related_hostnames: [
               {
-                count: 3,
-                hostname: ipsum
+                count: 2,
+                hostname: amet
               },
               {
                 count: 3,
                 hostname: dolor
               },
               {
-                count: 2,
-                hostname: amet
+                count: 3,
+                hostname: ipsum
               },
               {
                 count: 2,
@@ -304,12 +306,12 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
             ],
             related_hostnames: [
               {
-                count: 1,
-                hostname: lorem
-              },
-              {
                 count: 2,
                 hostname: amet
+              },
+              {
+                count: 1,
+                hostname: lorem
               }
             ]
           }
@@ -342,5 +344,113 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
 
   describe '#create' do
     # TODO
+    context 'with all needed params' do
+      let(:ip1) { '1.1.1.1' }
+      let(:lorem) { 'lorem.com' }
+      let(:ipsum) { 'ipsum.com' }
+      let(:dolor) { 'dolor.com' }
+      let(:amet) { 'amet.com' }
+      let(:sit) { 'sit.com' }
+      let(:wrong_hostname) { 9324 }
+
+      let(:payload) do
+        {
+          dns_records: {
+            ip: ip1,
+            hostnames_attributes: [
+              {
+                hostname: lorem
+              },
+              {
+                hostname: ipsum
+              },
+              {
+                hostname: dolor
+              },
+              {
+                hostname: amet
+              }
+            ]
+          }
+        }.to_json
+      end
+
+        let(:wrong_payload) do
+          {
+            dns_records: {
+              ip: ip1,
+              hostnames_attributes: [
+                {
+                  hostname: wrong_hostname
+                }
+              ]
+            }
+          }.to_json
+      end
+
+      let(:missing_payload) do
+        {
+          dns_records: {
+            ip: ip1
+          }
+        }.to_json
+    end
+
+      context 'and return success' do
+
+        before :each do
+          request.accept = 'application/json'
+          request.content_type = 'application/json'
+
+          post(:create, body: payload, format: :json)
+        end
+
+        it 'responds with valid response' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns all dns records with all hostnames' do
+          expect(parsed_body[:id]).not_to eq nil
+        end
+      end
+
+      context 'and return failed with code 422' do
+
+        before :each do
+          request.accept = 'application/json'
+          request.content_type = 'application/json'
+
+          post(:create, body: wrong_payload, format: :json)
+        end
+
+        it 'responds with code 422 response when hostname is wrong' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns a error' do
+          expect(parsed_body[:errors].length).to eq 1
+        end
+      end
+
+      context 'and return failed with code 422 when hostnames is missing' do
+
+        before :each do
+          request.accept = 'application/json'
+          request.content_type = 'application/json'
+
+          post(:create, body: missing_payload, format: :json)
+        end
+
+        it 'responds with code 422 response' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns a error' do
+          expect(parsed_body[:errors].length).to eq 1
+        end
+      end
+
+      
+    end
   end
 end

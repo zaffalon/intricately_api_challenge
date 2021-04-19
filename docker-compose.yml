@@ -21,6 +21,8 @@ services:
       - '3000:3000'
     environment:
       - DATABASE_HOST=db
+    volumes:
+      - '.:/project'
 
 volumes:
   postgres:
