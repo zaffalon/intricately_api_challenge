@@ -29,7 +29,7 @@ module Api
       end
 
       def validate_page_params
-        return render json: {errors: [{field: "page", message: "params page must exist"}]}, status: :unprocessable_entity unless params[:page]
+        return render json: {"page": ["params page must exist"]}, status: :bad_request unless params[:page]
       end
     end
   end

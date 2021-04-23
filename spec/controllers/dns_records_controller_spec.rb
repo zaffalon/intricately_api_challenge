@@ -336,8 +336,8 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
         get(:index)
       end
 
-      it 'responds with unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'responds with bad request status' do
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end
