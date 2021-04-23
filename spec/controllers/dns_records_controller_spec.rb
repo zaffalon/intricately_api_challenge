@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::DnsRecordsController, type: :controller do
-  render_views
   let(:parsed_body) { JSON.parse(response.body, symbolize_names: true) }
 
   describe '#index' do
