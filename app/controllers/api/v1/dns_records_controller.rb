@@ -5,20 +5,18 @@ module Api
 
       # GET /dns_records
       def index
-        @dns_records = DnsRecord.filter_by_params(params).paginate(page: params[:page], per_page: 10)
+        @dns_records = DnsQuery.filter(params).paginate(page: params[:page], per_page: 100)
 
-        @related_hostnames = Hostname.filter_and_count(params, @dns_records.ids.uniq)
-
-        render json: DnsRecordIndexSerializer.new(@dns_records, @related_hostnames).to_json
+        @related_hostnames = RelatedHostname.filter(@dns_records, params)
       end
 
       # POST /dns_records
       def create
         @dns_record = DnsRecord.new(dns_record_params)
         if @dns_record.save
-          render json: DnsRecordSerializer.new(@dns_record).to_json
+          render status: :created
         else
-          render json: ErrorSerializer.serialize(@dns_record), status: :unprocessable_entity
+          render json: @dns_record.errors, status: :unprocessable_entity
         end
       end
 

@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::DnsRecordsController, type: :controller do
+  render_views
   let(:parsed_body) { JSON.parse(response.body, symbolize_names: true) }
 
   describe '#index' do
@@ -343,7 +344,6 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
   end
 
   describe '#create' do
-    # TODO
     context 'with all needed params' do
       let(:ip1) { '1.1.1.1' }
       let(:lorem) { 'lorem.com' }
@@ -406,7 +406,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
         end
 
         it 'responds with valid response' do
-          expect(response).to have_http_status(:ok)
+          expect(response).to have_http_status(:created)
         end
 
         it 'returns all dns records with all hostnames' do
@@ -428,7 +428,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
         end
 
         it 'returns a error' do
-          expect(parsed_body[:errors].length).to eq 1
+          expect(parsed_body.length).to eq 1
         end
       end
 
@@ -446,7 +446,7 @@ RSpec.describe Api::V1::DnsRecordsController, type: :controller do
         end
 
         it 'returns a error' do
-          expect(parsed_body[:errors].length).to eq 1
+          expect(parsed_body.length).to eq 1
         end
       end
 
